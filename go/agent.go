@@ -26,6 +26,7 @@ func (sess *session) Exit(code int) error {
 	sess.exited = true
 
 	status := struct{ Status uint32 }{uint32(code)} // long
+	
 	_, err := sess.SendRequest("exit-status", false, gossh.Marshal(&status))
 	if err != nil {
 		return err
