@@ -18,6 +18,22 @@ const (
 	agentListenFile = "listener.sock"
 )
 
+func (sess *session) Exit(code int) error {
+	sess.Lock()
+	defer sess.Unlock()
+	if sess.exited {
+		return errors.New("Session.Exit called multiple times")
+	}
+	sess.exited = true
+
+	status := struct{ Status uint32 }{uint32(code)}
+	_, err := sess.SendRequest("exit-status", false, gossh.Marshal(&status))
+	if err != nil {
+		return err
+	}
+	return sess.Close()
+}
+
 // contextKeyAgentRequest is an internal context key for storing if the
 // client requested agent forwarding
 var contextKeyAgentRequest = &contextKey{"auth-agent-req"}
