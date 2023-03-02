@@ -19,8 +19,7 @@ const (
 )
 
 func (sess *session) Exit(code int) error {
-	sess.Lock()
-	defer sess.Unlock()
+	//defer sess.Unlock()
 	if sess.exited {
 		return errors.New("Session.Exit called multiple times")
 	}
