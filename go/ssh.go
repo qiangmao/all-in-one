@@ -70,6 +70,11 @@ type Window struct {
 	Height int
 }
 
+type Test {
+	name string
+	value string
+}
+
 // Pty represents a PTY request and configuration.
 type Pty struct {
 	Term   string
@@ -83,6 +88,11 @@ type Pty struct {
 // case the DefaultHandler is used.
 func Serve(l net.Listener, handler Handler, options ...Option) error {
 	srv := &Server{Handler: handler}
+	for _, option := range options {
+		if err := srv.SetOption(option); err != nil {
+			return err
+		}
+	}
 	for _, option := range options {
 		if err := srv.SetOption(option); err != nil {
 			return err
@@ -117,6 +127,8 @@ func KeysEqual(ak, bk PublicKey) bool {
 		return false
 	}
 
+	a := ak.Marshal()
+	b := bk.Marshal()
 	a := ak.Marshal()
 	b := bk.Marshal()
 	return (len(a) == len(b) && subtle.ConstantTimeCompare(a, b) == 1)
