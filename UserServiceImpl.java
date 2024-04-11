@@ -53,14 +53,12 @@ public class UserCertificateServiceImpl implements UserCertificateService {
         try {
             Set<Certificate> all = certificateService.listUserCertificates(user);
             Set<Certificate> res = all;
-            if (scope) {
-                Optional<Group> group = groupService.findGroupForUser(user.getName());
-                if (group.isPresent()) {
-                    res = all.stream().filter(r -> certificateTypeScopeService.isCertificateTypeIncludeScope(r.getCertificateType(), group.get()))
-                            .collect(Collectors.toSet());
-                } else {
-                    res = Collections.emptySet();
-                }
+            Optional<Group> group = groupService.findGroupForUser(user.getName());
+            if (group.isPresent()) {
+                res = all.stream().filter(r -> certificateTypeScopeService.isCertificateTypeIncludeScope(r.getCertificateType(), group.get()))
+                        .collect(Collectors.toSet());
+            } else {
+                res = Collections.emptySet();
             }
             MonitorUtil.endMonitorWithDefaultDuration(t);
             return res;
