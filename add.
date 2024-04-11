@@ -1,0 +1,17 @@
+@PostMapping(path = RestUri.PullRequestPath + "/comments")
+
+
+    public RestAnchorComment createPullRequestComment(@PullRequestParam(permission = Permission.REPO_READ) PullRequest pr,
+                                                      @UserParam User user,
+                                                      @RequestBody PrCreateCommentBody createPullRequestCommentBody) throws IOException, TException {
+        
+        DiffCommentUtil.checkPullRequestCommentArgs(createPullRequestCommentBody, pr);
+
+        PullRequestCommentAction commentAction = pullRequestCommentActionHelper.getCommentAction(createPullRequestCommentBody, user);
+        
+        AnchorComment anchorComment = pullRequestCommentService.createPullRequestComment(pr, commentAction, user);
+        
+        prCodeReviewProcessService.addPrProcessComment(pr, anchorComment);
+        
+        return RestAnchorComment.fromModel(anchorComment);
+    }
