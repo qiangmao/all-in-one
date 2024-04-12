@@ -51,7 +51,7 @@ public class UserCertificateServiceImpl implements UserCertificateService {
     public Set<Certificate> listUserCertificatesWithScope(User user, boolean scope) {
         Transaction t = MonitorUtil.startMonitor(MonitorType, "listUserCertificates.scope." + scope);
         try {
-            Set<Certificate> all = certificateService.listUserCertificates(user);
+                Set<Certificate> all = certificateService.listUserCertificates(user);
             Set<Certificate> res = all;
             Optional<Group> group = groupService.findGroupForUser(user.getName());
             if (group.isPresent()) {
