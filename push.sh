@@ -5,7 +5,7 @@ function listRemotes() {
 }
 
 function push() {
-    listRemotes
+        listRemotes
     for r in $remotes
     do
         echo "准备执行命令 git push $r $@"
