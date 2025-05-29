@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.model.GitHubPR;
+import com.example.demo.model.GitHubBranch;
 import org.kohsuke.github.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -107,5 +108,36 @@ public class GitHubService {
                     // 由于我们使用的是Object类型，这里只是示例
                     return prs;
                 });
+    }
+
+    /**
+     * 获取指定仓库的分支列表
+     * @param owner 仓库所有者
+     * @param repo 仓库名称
+     * @return 分支列表
+     */
+    public List<GitHubBranch> getBranches(String owner, String repo) {
+        try {
+            GitHub github;
+            if (githubToken != null && !githubToken.isEmpty()) {
+                github = new GitHubBuilder().withOAuthToken(githubToken).build();
+            } else {
+                github = GitHub.connectAnonymously();
+            }
+
+            GHRepository repository = github.getRepository(owner + "/" + repo);
+            List<GHBranch> branches = repository.getBranches().values().stream().collect(Collectors.toList());
+            
+            return branches.stream().map(branch -> {
+                GitHubBranch gitHubBranch = new GitHubBranch();
+                gitHubBranch.setName(branch.getName());
+                gitHubBranch.setCommitSha(branch.getSHA1());
+                gitHubBranch.setProtected(branch.isProtected());
+                gitHubBranch.setProtectionUrl(branch.getProtectionUrl());
+                return gitHubBranch;
+            }).collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new RuntimeException("获取GitHub分支信息失败", e);
+        }
     }
 }

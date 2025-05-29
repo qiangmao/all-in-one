@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.GitHubPR;
+import com.example.demo.model.GitHubBranch;
 import com.example.demo.service.GitHubService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -54,5 +55,20 @@ public class GitHubController {
         
         return gitHubService.listPullRequests(owner, repo, state, limit)
                 .map(ResponseEntity::ok);
+    }
+
+    /**
+     * 获取指定仓库的分支列表
+     * @param owner 仓库所有者
+     * @param repo 仓库名称
+     * @return 分支列表
+     */
+    @GetMapping("/repos/{owner}/{repo}/branches")
+    public ResponseEntity<List<GitHubBranch>> getBranches(
+            @PathVariable String owner,
+            @PathVariable String repo) {
+        
+        List<GitHubBranch> branches = gitHubService.getBranches(owner, repo);
+        return ResponseEntity.ok(branches);
     }
 }
