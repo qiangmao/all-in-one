@@ -100,12 +100,32 @@ public class GitHubService {
                     }
                 })
                 .retrieve()
-                .bodyToFlux(Object.class)
+                .bodyToFlux(java.util.Map.class)
                 .collectList()
                 .map(list -> {
                     List<GitHubPR> prs = new ArrayList<>();
-                    // 这里简化处理，实际应用中应该正确解析JSON响应
-                    // 由于我们使用的是Object类型，这里只是示例
+                    for (Object obj : list) {
+                        if (!(obj instanceof java.util.Map)) continue;
+                        java.util.Map map = (java.util.Map) obj;
+                        int number = ((Number) map.getOrDefault("number", 0)).intValue();
+                        String title = (String) map.getOrDefault("title", "");
+                        String stateVal = (String) map.getOrDefault("state", "");
+                        String htmlUrl = (String) map.getOrDefault("html_url", "");
+                        java.util.Map userMap = (java.util.Map) map.get("user");
+                        String userLogin = userMap != null ? (String) userMap.getOrDefault("login", "") : "";
+                        GitHubPR pr = new GitHubPR(number, title, stateVal, htmlUrl, userLogin);
+                        pr.setBody((String) map.getOrDefault("body", ""));
+                        pr.setCreatedAt((String) map.getOrDefault("created_at", ""));
+                        pr.setUpdatedAt((String) map.getOrDefault("updated_at", ""));
+                        pr.setClosedAt((String) map.getOrDefault("closed_at", null));
+                        pr.setMergedAt((String) map.getOrDefault("merged_at", null));
+                        pr.setComments(((Number) map.getOrDefault("comments", 0)).intValue());
+                        pr.setCommits(((Number) map.getOrDefault("commits", 0)).intValue());
+                        pr.setAdditions(((Number) map.getOrDefault("additions", 0)).intValue());
+                        pr.setDeletions(((Number) map.getOrDefault("deletions", 0)).intValue());
+                        pr.setChangedFiles(((Number) map.getOrDefault("changed_files", 0)).intValue());
+                        prs.add(pr);
+                    }
                     return prs;
                 });
     }
