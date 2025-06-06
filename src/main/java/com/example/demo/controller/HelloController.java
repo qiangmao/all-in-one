@@ -24,6 +24,7 @@ public class HelloController {
 
     @GetMapping("/message")
     public Message getMessage(@RequestParam(value = "content", defaultValue = "Hello World") String content) {
+        Message message = new Message();
         return messageService.createMessage(content);
     }
 }
