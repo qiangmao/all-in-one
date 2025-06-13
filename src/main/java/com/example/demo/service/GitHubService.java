@@ -104,6 +104,37 @@ public class GitHubService {
                 .collectList()
                 .map(list -> {
                     List<GitHubPR> prs = new ArrayList<>();
+                    for (java.util.Map prMap : list) {
+                        GitHubPR pr = new GitHubPR();
+                        // number/title/state/html_url/user.login
+                        Object number = prMap.get("number");
+                        if (number != null) pr.setId(Long.valueOf(number.toString()));
+                        pr.setTitle((String) prMap.get("title"));
+                        pr.setState((String) prMap.get("state"));
+                        pr.setHtmlUrl((String) prMap.get("html_url"));
+                        Object userObj = prMap.get("user");
+                        if (userObj instanceof java.util.Map) {
+                            Object login = ((java.util.Map) userObj).get("login");
+                            if (login != null) pr.setUser(login.toString());
+                        }
+                        pr.setBody((String) prMap.get("body"));
+                        pr.setCreatedAt(prMap.get("created_at") != null ? prMap.get("created_at").toString() : null);
+                        pr.setUpdatedAt(prMap.get("updated_at") != null ? prMap.get("updated_at").toString() : null);
+                        pr.setClosedAt(prMap.get("closed_at") != null ? prMap.get("closed_at").toString() : null);
+                        pr.setMergedAt(prMap.get("merged_at") != null ? prMap.get("merged_at").toString() : null);
+                        // comments/commits/additions/deletions/changed_files
+                        Object comments = prMap.get("comments");
+                        if (comments != null) pr.setComments(Integer.parseInt(comments.toString()));
+                        Object commits = prMap.get("commits");
+                        if (commits != null) pr.setCommits(Integer.parseInt(commits.toString()));
+                        Object additions = prMap.get("additions");
+                        if (additions != null) pr.setAdditions(Integer.parseInt(additions.toString()));
+                        Object deletions = prMap.get("deletions");
+                        if (deletions != null) pr.setDeletions(Integer.parseInt(deletions.toString()));
+                        Object changedFiles = prMap.get("changed_files");
+                        if (changedFiles != null) pr.setChangedFiles(Integer.parseInt(changedFiles.toString()));
+                        prs.add(pr);
+                    }
                     return prs;
                 });
     }
